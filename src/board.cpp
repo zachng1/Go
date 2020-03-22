@@ -8,18 +8,18 @@ Board::~Board() {};
 
 void Board::printBoard() {
     for (int i = -1; i < size; i++) {  
-        if (i != -1) std::cout << i;
+        if (i != -1) std::cout << i % 10;
         else std::cout << ' ';
         for (int j = 0; j < size; j++) {
             //print coord row
             if (i == -1) {
-                std::cout << j;
+                std::cout << j % 10;
                 continue;
             }
             int c = board[j][i];
             if (c == BLACK) std::cout << 'b';
             else if (c == WHITE) std::cout << 'w';
-            else std::cout << '-';
+            else std::cout << '+';
         }
         std::cout << std::endl;
 
