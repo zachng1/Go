@@ -1,16 +1,16 @@
 #include "board.h"
 
-Board::Board() : board(std::vector<std::vector<int>> (19, std::vector<int> (19, EMPTY))), size(19) {};
+Board::Board() : board(std::vector<std::vector<int>> (19, std::vector<int> (19, EMPTY))), s(19) {}
 
-Board::Board(int size) : board(std::vector<std::vector<int>> (size, std::vector<int> (size, EMPTY))), size(size) {};
+Board::Board(int s) : board(std::vector<std::vector<int>> (s, std::vector<int> (s, EMPTY))), s(s) {}
 
-Board::~Board() {};
+Board::~Board() {}
 
 void Board::printBoard() {
-    for (int i = -1; i < size; i++) {  
+    for (int i = -1; i < s; i++) {
         if (i != -1) std::cout << i % 10;
         else std::cout << ' ';
-        for (int j = 0; j < size; j++) {
+        for (int j = 0; j < s; j++) {
             //print coord row
             if (i == -1) {
                 std::cout << j % 10;
@@ -28,7 +28,7 @@ void Board::printBoard() {
 
 int Board::placeStone(int COLOUR, int x, int y) {
     if (x * y < 0) return -1; //no negative coords
-    if (x >= size || y >= size) return -1; //must be within size
+    if (x >= s || y >= s) return -1; //must be within size
         
     switch (COLOUR) {
         case EMPTY:
@@ -57,7 +57,7 @@ int Board::checkAlive(int GROUPCOLOUR, int x, int y, std::vector<std::vector<boo
 
     //look to all left right up down for empty space, only if not already checked and if not opposite colour
     //these are ugly i know -- but had to separate the first if statement to avoid out of bounds access on board
-    if (x + 1 < size) {
+    if (x + 1 < s) {
         if (board[x + 1][y] != !GROUPCOLOUR && !helper[x+1][y]) {
             if (!checkAlive(GROUPCOLOUR, x + 1, y, helper)) return 0;
         }
@@ -72,7 +72,7 @@ int Board::checkAlive(int GROUPCOLOUR, int x, int y, std::vector<std::vector<boo
             if (!checkAlive(GROUPCOLOUR, x, y - 1, helper)) return 0;
         }
     }
-    if (y + 1 < size) { 
+    if (y + 1 < s) {
         if (board[x][y + 1]!= !GROUPCOLOUR && !helper[x][y+1]) {
             if (!checkAlive(GROUPCOLOUR, x, y + 1, helper)) return 0;
         }
@@ -81,10 +81,9 @@ int Board::checkAlive(int GROUPCOLOUR, int x, int y, std::vector<std::vector<boo
 }
 
 int Board::removeGroup(std::vector<std::vector<bool>> helper) {
-    size_t size = helper.size();
     int removed = 0;
-    for (uint i = 0; i < size; i++) {
-        for (uint j = 0; j < size; j++) {
+    for (int i = 0; i < s; i++) {
+        for (int j = 0; j < s; j++) {
             if (helper[j][i]) {
                 board[j][i] = EMPTY;
                 removed++;
@@ -99,4 +98,8 @@ bool Board::checkPosStatus(int COLOUR, int x, int y) {
         return true;
     }
     else return false;
+}
+
+int Board::size() {
+    return s;
 }
