@@ -7,8 +7,15 @@ Board::Board(int size) : board(std::vector<std::vector<int>> (size, std::vector<
 Board::~Board() {};
 
 void Board::printBoard() {
-    for (int i = 0; i < size; i++) {
+    for (int i = -1; i < size; i++) {  
+        if (i != -1) std::cout << i;
+        else std::cout << ' ';
         for (int j = 0; j < size; j++) {
+            //print coord row
+            if (i == -1) {
+                std::cout << j;
+                continue;
+            }
             int c = board[j][i];
             if (c == BLACK) std::cout << 'b';
             else if (c == WHITE) std::cout << 'w';
@@ -24,9 +31,10 @@ int Board::placeStone(int COLOUR, int x, int y) {
     if (x >= size || y >= size) return -1; //must be within size
         
     switch (COLOUR) {
+        case EMPTY:
         case BLACK:
         case WHITE: break;
-        default: return -1; //have to place black or white
+        default: return -1; //have to place black white or empty
     }
 
     switch (board[x][y]) {
@@ -43,9 +51,9 @@ int Board::placeStone(int COLOUR, int x, int y) {
 //helper MUST be reset before calling again
 int Board::checkAlive(int GROUPCOLOUR, int x, int y, std::vector<std::vector<bool>> &helper) {
     if (GROUPCOLOUR != WHITE && GROUPCOLOUR != BLACK) return -1; //shouldn't be checking non w/b group
-    if (board[x][y] == EMPTY) return 0; //if empty reached: alive!
+    if (board[x][y] == EMPTY) return 0; //if empty reached: alive
 
-    helper[x][y] = true; //mark as checked so w e don't get stuck in recursion loop
+    helper[x][y] = true; //mark as checked so we don't get stuck in recursion loop
 
     //look to all left right up down for empty space, only if not already checked and if not opposite colour
     //these are ugly i know -- but had to separate the first if statement to avoid out of bounds access on board
@@ -69,10 +77,26 @@ int Board::checkAlive(int GROUPCOLOUR, int x, int y, std::vector<std::vector<boo
             if (!checkAlive(GROUPCOLOUR, x, y + 1, helper)) return 0;
         }
     }
-
     return 1; //if return 1, group is dead. Helper will also be set with co-ords of all stones to kill
 }
 
 int Board::removeGroup(std::vector<std::vector<bool>> helper) {
+    size_t size = helper.size();
+    int removed = 0;
+    for (uint i = 0; i < size; i++) {
+        for (uint j = 0; j < size; j++) {
+            if (helper[j][i]) {
+                board[j][i] = EMPTY;
+                removed++;
+            }
+        }
+    }
+    return removed;
+}
 
+bool Board::checkPosStatus(int COLOUR, int x, int y) {
+    if (board[x][y] == COLOUR) {
+        return true;
+    }
+    else return false;
 }
