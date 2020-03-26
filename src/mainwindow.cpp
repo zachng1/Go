@@ -1,22 +1,12 @@
 #include "mainwindow.h"
 #include <QtWidgets>
+#include "board.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    board(new Board(19)),
-    display(new QWidget),
-    layout(new QGridLayout)
-{
-    for (int i = 0; i < board->size(); i++) {
-        for (int j = 0; j < board->size(); j++) {
-            layout->addWidget(new QPushButton("+"), j, i);
-        }
-    }
-
-    layout->setHorizontalSpacing(0);
-    layout->setVerticalSpacing(0);
-
-    display->setLayout(layout);
-    setCentralWidget(display);
-
+    QMainWindow(parent) {
+    QGraphicsScene * scene = new QGraphicsScene;
+    QGraphicsView * view = new QGraphicsView(scene);
+    Board * b = new Board(19);
+    scene->addItem(b);
+    setCentralWidget(view);
 }

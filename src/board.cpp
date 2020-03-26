@@ -22,7 +22,7 @@ Board::Board() :
 }
 
 Board::Board(int s) :
-    QGraphicsRectItem(0, 0, (s + 2) * 100, (s + 2) * 100),
+    QGraphicsRectItem(0, 0, s * 50, s * 50),
     board(std::vector<std::vector<Square *>> (s, std::vector<Square *> (s, nullptr))),
     helper(std::vector<std::vector<bool>> (s, std::vector<bool> (s, false))),
     s(s)
@@ -37,7 +37,7 @@ Board::Board(int s) :
     setBrush(brush);
     for (int i = 0; i < s; i++) {
         for (int j = 0; j < s; j++) {
-           board[j][i] = new Square(j, i, 100, 100, this);
+           board[j][i] = new Square((j * 50), (i*50), 50, 50, this);
         }
     }
 }
