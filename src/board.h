@@ -5,11 +5,11 @@
 #include <iostream>
 #include <QGraphicsItem>
 #include "square.h"
+#include "intersection.h"
 #include "enum.h"
 
 class Board : public QGraphicsRectItem {
     public:
-    Board();
     Board(int s);
     ~Board();
 
@@ -21,7 +21,8 @@ class Board : public QGraphicsRectItem {
     int size();
 
     private:
-    std::vector<std::vector<Square *>> board;
+    std::vector<std::vector<Square *>> squares;
+    std::vector<std::vector<Intersection *>> board;
     std::vector<std::vector<bool>> helper;
     int s;
     QPen pen;

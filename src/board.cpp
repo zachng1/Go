@@ -1,29 +1,10 @@
 #include "board.h"
 #include <QtWidgets>
 
-Board::Board() :
-    QGraphicsRectItem(0, 0, (19 + 2) * 100, (19 + 2) * 100),
-    board(std::vector<std::vector<Square *>> (19, std::vector<Square *> (19, nullptr))),
-    helper(std::vector<std::vector<bool>> (19, std::vector<bool> (19, false))),
-    s(19)
-{
-    pen.setStyle(Qt::SolidLine);
-    pen.setBrush(Qt::black);
-    pen.setWidth(2);
-    setPen(pen);
-    brush.setStyle(Qt::SolidPattern);
-    brush.setColor(QColor::fromRgb(220, 179, 92));
-    setBrush(brush);
-    for (int i = 0; i < 19; i++) {
-        for (int j = 0; j < 19; j++) {
-           board[j][i] = new Square(j, i, 100, 100, this);
-        }
-    }
-}
-
 Board::Board(int s) :
-    QGraphicsRectItem(0, 0, s * 50, s * 50),
-    board(std::vector<std::vector<Square *>> (s, std::vector<Square *> (s, nullptr))),
+    QGraphicsRectItem(0, 0, (s * 50), (s * 50)),
+    squares(std::vector<std::vector<Square *>> (s, std::vector<Square *> (s, nullptr))),
+    board(std::vector<std::vector<Intersection *>> (s + 1, std::vector<Intersection *> (s + 1, nullptr))),
     helper(std::vector<std::vector<bool>> (s, std::vector<bool> (s, false))),
     s(s)
 {
@@ -37,11 +18,17 @@ Board::Board(int s) :
     setBrush(brush);
     for (int i = 0; i < s; i++) {
         for (int j = 0; j < s; j++) {
-           board[j][i] = new Square((j * 50), (i*50), 50, 50, this);
+           squares[j][i] = new Square((j * 50), (i * 50), 50, 50, this);
+        }
+    }
+    for (int i = 0; i < s + 1; i++) {
+        for (int j = 0 ; j < s + 1; j++) {
+            board[j][i] = new Intersection((j * 50) - 2, (i * 50) - 2, 5, 5, this);
         }
     }
 }
 
+//FIX
 Board::~Board() {
     for (int i = 0; i < s; i++) {
         for (int j = 0; j < s; j++) {

@@ -6,8 +6,7 @@ Square::Square(qreal x,
                qreal width,
                qreal height,
                QGraphicsItem * parent) :
-    QGraphicsRectItem(x, y, width + 1, height + 1 ,parent),
-    status(EMPTY)
+    QGraphicsRectItem(x, y, width + 1, height + 1 ,parent)
 {
     pen.setStyle(Qt::SolidLine);
     pen.setBrush(Qt::black);

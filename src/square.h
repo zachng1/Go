@@ -18,8 +18,6 @@ public:
 private:
     QBrush brush;
     QPen pen;
-    int status;
-    friend class Board;
 };
 
 #endif // SQUARE_H
