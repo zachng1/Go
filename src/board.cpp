@@ -1,91 +1,115 @@
 #include "board.h"
+#include <QtWidgets>
 
-Board::Board() : board(std::vector<std::vector<int>> (19, std::vector<int> (19, EMPTY))), s(19) {}
-
-Board::Board(int s) : board(std::vector<std::vector<int>> (s, std::vector<int> (s, EMPTY))), s(s) {}
-
-Board::~Board() {}
-
-void Board::printBoard() {
-    for (int i = -1; i < s; i++) {
-        if (i != -1) std::cout << i % 10;
-        else std::cout << ' ';
-        for (int j = 0; j < s; j++) {
-            //print coord row
-            if (i == -1) {
-                std::cout << j % 10;
-                continue;
-            }
-            int c = board[j][i];
-            if (c == BLACK) std::cout << 'b';
-            else if (c == WHITE) std::cout << 'w';
-            else std::cout << '+';
+Board::Board() :
+    QGraphicsRectItem(0, 0, (19 + 2) * 100, (19 + 2) * 100),
+    board(std::vector<std::vector<Square *>> (19, std::vector<Square *> (19, nullptr))),
+    helper(std::vector<std::vector<bool>> (19, std::vector<bool> (19, false))),
+    s(19)
+{
+    pen.setStyle(Qt::SolidLine);
+    pen.setBrush(Qt::black);
+    pen.setWidth(2);
+    setPen(pen);
+    brush.setStyle(Qt::SolidPattern);
+    brush.setColor(QColor::fromRgb(220, 179, 92));
+    setBrush(brush);
+    for (int i = 0; i < 19; i++) {
+        for (int j = 0; j < 19; j++) {
+           board[j][i] = new Square(j, i, 100, 100, this);
         }
-        std::cout << std::endl;
+    }
+}
 
+Board::Board(int s) :
+    QGraphicsRectItem(0, 0, (s + 2) * 100, (s + 2) * 100),
+    board(std::vector<std::vector<Square *>> (s, std::vector<Square *> (s, nullptr))),
+    helper(std::vector<std::vector<bool>> (s, std::vector<bool> (s, false))),
+    s(s)
+{
+    QPen pen;
+    pen.setStyle(Qt::SolidLine);
+    pen.setBrush(Qt::black);
+    pen.setWidth(2);
+    setPen(pen);
+    brush.setStyle(Qt::SolidPattern);
+    brush.setColor(QColor::fromRgb(220, 179, 92));
+    setBrush(brush);
+    for (int i = 0; i < s; i++) {
+        for (int j = 0; j < s; j++) {
+           board[j][i] = new Square(j, i, 100, 100, this);
+        }
+    }
+}
+
+Board::~Board() {
+    for (int i = 0; i < s; i++) {
+        for (int j = 0; j < s; j++) {
+            delete board[j][i];
+        }
     }
 }
 
 int Board::placeStone(int COLOUR, int x, int y) {
     if (x * y < 0) return -1; //no negative coords
-    if (x >= s || y >= s) return -1; //must be within size
-        
-    switch (COLOUR) {
-        case EMPTY:
-        case BLACK:
-        case WHITE: break;
-        default: return -1; //have to place black white or empty
-    }
+       if (x >= s || y >= s) return -1; //must be within size
 
-    switch (board[x][y]) {
-        case EMPTY: break;
-        default: return -1; //can't place on already existing spot
-    }
+       switch (COLOUR) {
+           case EMPTY:
+           case BLACK:
+           case WHITE: break;
+           default: return -1; //have to place black white or empty
+       }
 
-    board[x][y] = COLOUR;
-    return 0;
+       switch (board[x][y]->status) {
+           case EMPTY: break;
+           default: return -1; //can't place on already existing spot
+       }
+
+       board[x][y]->status = COLOUR;
+       return 0;
 };
 
 //return 0 if group is alive, 1 if dead, and -1 if you are checking an empty group
 //if group is dead, helper will be set with co-ords of stones to kill
 //helper MUST be reset before calling again
-int Board::checkAlive(int GROUPCOLOUR, int x, int y, std::vector<std::vector<bool>> &helper) {
+int Board::checkAlive(int GROUPCOLOUR, int x, int y) {
     if (GROUPCOLOUR != WHITE && GROUPCOLOUR != BLACK) return -1; //shouldn't be checking non w/b group
-    if (board[x][y] == EMPTY) return 0; //if empty reached: alive
+    if (board[x][y]->status == EMPTY) return 0; //if empty reached: alive
 
     helper[x][y] = true; //mark as checked so we don't get stuck in recursion loop
 
     //look to all left right up down for empty space, only if not already checked and if not opposite colour
     //these are ugly i know -- but had to separate the first if statement to avoid out of bounds access on board
     if (x + 1 < s) {
-        if (board[x + 1][y] != !GROUPCOLOUR && !helper[x+1][y]) {
-            if (!checkAlive(GROUPCOLOUR, x + 1, y, helper)) return 0;
+        if (board[x + 1][y]->status != !GROUPCOLOUR && !helper[x+1][y]) {
+            if (!checkAlive(GROUPCOLOUR, x + 1, y)) return 0;
         }
     }
     if (x - 1 >= 0) {
-        if (board[x - 1][y] != !GROUPCOLOUR && !helper[x-1][y]) {
-            if (!checkAlive(GROUPCOLOUR, x - 1, y, helper)) return 0;
+        if (board[x - 1][y]->status != !GROUPCOLOUR && !helper[x-1][y]) {
+            if (!checkAlive(GROUPCOLOUR, x - 1, y)) return 0;
         }
     }
     if (y - 1 >= 0) { 
-        if (board[x][y - 1]!= !GROUPCOLOUR && !helper[x][y-1]) {
-            if (!checkAlive(GROUPCOLOUR, x, y - 1, helper)) return 0;
+        if (board[x][y - 1]->status != !GROUPCOLOUR && !helper[x][y-1]) {
+            if (!checkAlive(GROUPCOLOUR, x, y - 1)) return 0;
         }
     }
     if (y + 1 < s) {
-        if (board[x][y + 1]!= !GROUPCOLOUR && !helper[x][y+1]) {
-            if (!checkAlive(GROUPCOLOUR, x, y + 1, helper)) return 0;
+        if (board[x][y + 1]->status != !GROUPCOLOUR && !helper[x][y+1]) {
+            if (!checkAlive(GROUPCOLOUR, x, y + 1)) return 0;
         }
     }
     return 1; //if return 1, group is dead. Helper will also be set with co-ords of all stones to kill
 }
 
-int Board::removeGroup(std::vector<std::vector<bool>> helper) {
+int Board::removeGroup() {
     int removed = 0;
     for (int i = 0; i < s; i++) {
         for (int j = 0; j < s; j++) {
             if (helper[j][i]) {
-                board[j][i] = EMPTY;
+                board[j][i]->status = EMPTY;
                 removed++;
             }
         }
@@ -94,7 +118,7 @@ int Board::removeGroup(std::vector<std::vector<bool>> helper) {
 }
 
 bool Board::checkPosStatus(int COLOUR, int x, int y) {
-    if (board[x][y] == COLOUR) {
+    if (board[x][y]->status == COLOUR) {
         return true;
     }
     else return false;

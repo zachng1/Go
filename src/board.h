@@ -3,24 +3,29 @@
 
 #include <vector>
 #include <iostream>
+#include <QGraphicsItem>
+#include "square.h"
+#include "enum.h"
 
-enum space_state {BLACK, WHITE, EMPTY};
-
-class Board {
+class Board : public QGraphicsRectItem {
     public:
     Board();
     Board(int s);
     ~Board();
-    void printBoard();
+
+
     int placeStone(int COLOUR, int x, int y);
-    int checkAlive(int GROUPCOLOUR, int x, int y, std::vector<std::vector<bool>> &helper);
-    int removeGroup(std::vector<std::vector<bool>> helper);
+    int checkAlive(int GROUPCOLOUR, int x, int y);
+    int removeGroup();
     bool checkPosStatus(int COLOUR, int x, int y);
     int size();
 
     private:
-    std::vector<std::vector<int>> board;
+    std::vector<std::vector<Square *>> board;
+    std::vector<std::vector<bool>> helper;
     int s;
+    QPen pen;
+    QBrush brush;
 
 };
 

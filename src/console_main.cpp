@@ -3,7 +3,7 @@
 #include <sstream>
 #include <limits>
 #include "board.h"
-
+/*
 void printHelper(std::vector<std::vector<bool>> helper);
 int getCoords(int &x, int &y);
 void invalidPosition(Board b);
@@ -137,3 +137,5 @@ void checkAndRemove(Board &b, int mode, int x, int y, std::vector<std::vector<bo
 		}
 	}
 }
+
+*/
