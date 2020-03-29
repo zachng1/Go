@@ -28,6 +28,8 @@ class Board : public QGraphicsRectItem {
     QPen pen;
     QBrush brush;
 
+    void resetHelper();
+
 };
 
 
