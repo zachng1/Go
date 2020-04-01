@@ -20,41 +20,21 @@ Intersection::Intersection(Qt::GlobalColor colour, qreal x, qreal y, qreal width
     setAcceptedMouseButtons(Qt::LeftButton);
 }
 
-int Intersection::Status() {
+int Intersection::status() {
     return state;
 }
 
-void Intersection::setStatus(int COLOUR) {
+void Intersection::setStatus(int COLOUR, bool permanent) {
     state = COLOUR;
-    stone = new Stone(true, COLOUR, xpos-25, ypos-25, 50, 50, this);
-}
-
-void Intersection::givePosition(int x, int y) {
-    xpos = x;
-    ypos = y;
-}
-
-void Intersection::setCoords(int x, int y) {
-    xcoord = x;
-    ycoord = y;
-}
-
-void Intersection::hoverEnterEvent(QGraphicsSceneHoverEvent * event) {
-    //fix up so COLOUR is transmitted via global turn
-    if (stone == nullptr) {
-        stone = new Stone(false, WHITE, xpos - 25, ypos - 25, 50, 50, this);
+    std::cout << pos().x() << pos().y() << std::endl;
+    if (COLOUR != EMPTY) {
+        stone = new Stone(permanent, COLOUR, -25, -25, 50, 50, this);
+        //stone->setPos(pos().x(), pos().y());
+        std::cout << "set" << std::endl;
     }
-}
-
-void Intersection::hoverLeaveEvent(QGraphicsSceneHoverEvent * event) {
-    if (!stone->Opacity()) {
+    else {
+        std::cout << "Delete action" << std::endl;
         delete stone;
-        stone = nullptr;
     }
-}
-
-void Intersection::mousePressEvent(QGraphicsSceneMouseEvent * event) {
-    //sorry this is so yucky!!!
-    ((Board *) parentItem())->placeStone(WHITE, xcoord, ycoord);
 }
 

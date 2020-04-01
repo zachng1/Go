@@ -12,24 +12,15 @@ class Intersection : public QGraphicsEllipseItem
 {
 public:
     Intersection(Qt::GlobalColor, qreal x, qreal y, qreal width, qreal height, QGraphicsItem * parent = nullptr);
-    int Status();
-    void setStatus(int COLOUR);
-    void givePosition(int x, int y);
-    void setCoords(int x, int y);
-
-    void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent * event);
-    void mousePressEvent(QGraphicsSceneMouseEvent * event);
+    int status();
+    void setStatus(int COLOUR, bool permanent);
 
 private:
     QPen pen;
     QBrush brush;
     Stone * stone;
     int state;
-    int xpos;
-    int ypos;
-    int xcoord;
-    int ycoord;
+
 
 };
 

@@ -6,8 +6,12 @@ Board::Board(int s) :
     squares(std::vector<std::vector<Square *>> (s, std::vector<Square *> (s, nullptr))),
     board(std::vector<std::vector<Intersection *>> (s + 1, std::vector<Intersection *> (s + 1, nullptr))),
     helper(std::vector<std::vector<bool>> (s + 1, std::vector<bool> (s + 1, false))),
-    s(s)
+    s(s),
+    turn(0),
+    hoverx(-1), hovery(-1)
 {
+    setAcceptHoverEvents(true);
+
     QPen pen;
     pen.setStyle(Qt::SolidLine);
     pen.setBrush(Qt::black);
@@ -24,6 +28,7 @@ Board::Board(int s) :
     }
     for (int i = 0; i < s + 1; i++) {
         for (int j = 0 ; j < s + 1; j++) {
+            //setting up corner intersections
             if ((j == 3 && i == 3) ||
                 (j == 9 && i == 3) ||
                 (j == 15 && i == 3) ||
@@ -33,13 +38,13 @@ Board::Board(int s) :
                 (j == 9 && i == 15) ||
                 (j == 15 && i == 9) ||
                     (j == 15 && i == 15)) {
-                board[j][i] = new Intersection(Qt::black, ((j + 0.5) * 51) - 12.5, ((i + 0.5) * 51) - 12.5, 25, 25, this);
+                board[j][i] = new Intersection(Qt::black, -10, -10, 20, 20, this);
+                board[j][i]->setPos((((double) j + 0.5) * 51), (((double)i + 0.5) * 51));
             }
             else {
-                board[j][i] = new Intersection(Qt::transparent, ((j + 0.5) * 51) - 12.5, ((i + 0.5) * 51) - 12.5, 25, 25, this);
+                board[j][i] = new Intersection(Qt::transparent, -10, -10, 20, 20, this);
+                board[j][i]->setPos((((double)j + 0.5) * 51), (((double)i + 0.5) * 51));
             }
-            board[j][i]->givePosition(((j + 0.5) * 51), ((i + 0.5) * 51));
-            board[j][i]->setCoords(j, i);
         }
     }
 }
@@ -58,6 +63,14 @@ Board::~Board() {
     delete this;
 }
 
+void Board::hoverStone(int COLOUR, int x, int y) {
+    board[x][y]->setStatus(COLOUR, false);
+}
+
+void Board::removeHoverStone(int x, int y) {
+    board[x][y]->setStatus(EMPTY, false);
+}
+
 int Board::placeStone(int COLOUR, int x, int y) {
     if (x * y < 0) return -1; //no negative coords
        if (x >= s || y >= s) return -1; //must be within size
@@ -69,13 +82,13 @@ int Board::placeStone(int COLOUR, int x, int y) {
            default: return -1; //have to place black white or empty
        }
        if (COLOUR != WHITE || COLOUR != BLACK) {
-           switch (board[x][y]->Status()) {
+           switch (board[x][y]->status()) {
                case EMPTY: break;
                default: return -1; //can't place on already existing spot
            }
        }
 
-       board[x][y]->setStatus(COLOUR);
+       board[x][y]->setStatus(COLOUR, true);
        return 0;
 };
 
@@ -83,7 +96,7 @@ int Board::placeStone(int COLOUR, int x, int y) {
 //if group is dead, removes group and returns size of group removed
 int Board::checkAlive(int GROUPCOLOUR, int x, int y) {
     if (GROUPCOLOUR != WHITE && GROUPCOLOUR != BLACK) return -1; //shouldn't be checking non w/b group: don't need to reset helper bc will only happen on first call
-    if (board[x][y]->Status() == EMPTY) {
+    if (board[x][y]->status() == EMPTY) {
         resetHelper();
         return 0; //if empty reached: alive
     }
@@ -93,7 +106,7 @@ int Board::checkAlive(int GROUPCOLOUR, int x, int y) {
     //look to all left right up down for empty space, only if not already checked and if not opposite colour
     //these are ugly i know -- but had to separate the first if statement to avoid out of bounds access on board
     if (x + 1 < s + 1) {
-        if (board[x + 1][y]->Status() != !GROUPCOLOUR && !helper[x+1][y]) {
+        if (board[x + 1][y]->status() != !GROUPCOLOUR && !helper[x+1][y]) {
             if (!checkAlive(GROUPCOLOUR, x + 1, y)) {
                 resetHelper();
                 return 0;
@@ -101,7 +114,7 @@ int Board::checkAlive(int GROUPCOLOUR, int x, int y) {
         }
     }
     if (x - 1 >= 0) {
-        if (board[x - 1][y]->Status() != !GROUPCOLOUR && !helper[x-1][y]) {
+        if (board[x - 1][y]->status() != !GROUPCOLOUR && !helper[x-1][y]) {
             if (!checkAlive(GROUPCOLOUR, x - 1, y)) {
                 resetHelper();
                 return 0;
@@ -109,7 +122,7 @@ int Board::checkAlive(int GROUPCOLOUR, int x, int y) {
         }
     }
     if (y - 1 >= 0) { 
-        if (board[x][y - 1]->Status() != !GROUPCOLOUR && !helper[x][y-1]) {
+        if (board[x][y - 1]->status() != !GROUPCOLOUR && !helper[x][y-1]) {
             if (!checkAlive(GROUPCOLOUR, x, y - 1)) {
                 resetHelper();
                 return 0;
@@ -117,7 +130,7 @@ int Board::checkAlive(int GROUPCOLOUR, int x, int y) {
         }
     }
     if (y + 1 < s + 1) {
-        if (board[x][y + 1]->Status() != !GROUPCOLOUR && !helper[x][y+1]) {
+        if (board[x][y + 1]->status() != !GROUPCOLOUR && !helper[x][y+1]) {
             if (!checkAlive(GROUPCOLOUR, x, y + 1)) {
                 resetHelper();
                 return 0;
@@ -134,7 +147,7 @@ int Board::removeGroup() {
     for (int i = 0; i < s; i++) {
         for (int j = 0; j < s; j++) {
             if (helper[j][i]) {
-                board[j][i]->setStatus(EMPTY);
+                board[j][i]->setStatus(EMPTY, true);
                 removed++;
             }
         }
@@ -143,7 +156,7 @@ int Board::removeGroup() {
 }
 
 bool Board::checkPosStatus(int COLOUR, int x, int y) {
-    if (board[x][y]->Status() == COLOUR) {
+    if (board[x][y]->status() == COLOUR) {
         return true;
     }
     else return false;
@@ -159,4 +172,33 @@ void Board::resetHelper() {
             helper[j][i] = false;
         }
     }
+}
+
+void Board::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
+    QPointF position = event->lastScenePos();
+
+    //convert coordinates into array indexes
+    int x = (int) std::round(((position.x())/ 51) - 0.5);
+    int y = (int) std::round(((position.y())/ 51) - 0.5);
+
+    if ( x > s || y > s || (int) x < 0 || (int) y < 0) return;
+    //first condition is checking if this is the first hover event when hx and hy = -1 each
+    if (hoverx + hovery == -2) {
+        hoverx = x;
+        hovery = y;
+        hoverStone(whosTurn(), (int) std::round(hoverx), (int) std::round(hovery));
+    }
+    else if ((int) std::round(x) != (int) std::round(hoverx) || (int) std::round(y) != (int) std::round(hovery)) {
+        removeHoverStone(hoverx, hovery);
+        hoverx = x;
+        hovery = y;
+        hoverStone(whosTurn(), (int) std::round(hoverx), (int) std::round(hovery));
+    }
+}
+
+int Board::whosTurn() {
+    if (turn % 2 == 0) {
+        return BLACK;
+    }
+    else return WHITE;
 }
