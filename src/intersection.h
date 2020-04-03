@@ -14,12 +14,14 @@ public:
     Intersection(Qt::GlobalColor, qreal x, qreal y, qreal width, qreal height, QGraphicsItem * parent = nullptr);
     int status();
     void setStatus(int COLOUR, bool permanent);
+    bool permanent();
 
 private:
     QPen pen;
     QBrush brush;
     Stone * stone;
     int state;
+    bool hoverstate;
 
 
 };

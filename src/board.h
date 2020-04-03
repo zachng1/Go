@@ -9,6 +9,7 @@
 #include "enum.h"
 #include <QEvent>
 #include <QGraphicsSceneHoverEvent>
+#include <QGraphicsSceneMouseEvent>
 #include <QPointF>
 
 class Board : public QGraphicsRectItem {
@@ -28,6 +29,7 @@ class Board : public QGraphicsRectItem {
     //implemented here bc other option was in intersection class
     //got messy when needing to access turn state
     void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
     int whosTurn();
 
     private:
