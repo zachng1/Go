@@ -1,10 +1,12 @@
 #include "mainwindow.h"
 #include <QtWidgets>
-#include "game.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent) {
-    Game * game = new Game;
-    QGraphicsView * view = new QGraphicsView(game);
+    QMainWindow(parent),
+    game(new Game)
+{
+    view = new QGraphicsView(game);
     setCentralWidget(view);
+    setStatusBar(new QStatusBar);
+    setMenuBar(new QMenuBar);
 }

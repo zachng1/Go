@@ -3,9 +3,9 @@
 
 #include <QMainWindow>
 #include <QWidget>
-#include <QPushButton>
-#include <QGridLayout>
+#include <QGraphicsView>
 #include "board.h"
+#include "game.h"
 
 class MainWindow : public QMainWindow
 {
@@ -18,6 +18,8 @@ signals:
 public slots:
 
 private:
+    Game * game;
+    QGraphicsView * view;
 
 };
 

@@ -215,6 +215,7 @@ void Board::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     if (event->button() == Qt::RightButton) {
         return;
     }
+    int killed = 0;
     QPointF position = event->lastScenePos();
     //convert coordinates into array indexes
     int x = (int) std::round(((position.x())/ 51) - 0.5);
@@ -226,30 +227,39 @@ void Board::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     placeStone(whosTurn(), x, y);
 
     if (x + 1 < s) {
-        if (checkAlive(!whosTurn(), x + 1, y)) {
-            removeGroup();
+        if (checkAlive(!whosTurn(), x + 1, y) > 0) {
+            killed += removeGroup();
             resetHelper();
         }
     }
     if (x - 1 >= 0) {
-        if (checkAlive(!whosTurn(), x - 1, y)) {
-            removeGroup();
+        if (checkAlive(!whosTurn(), x - 1, y) > 0) {
+            killed += removeGroup();
             resetHelper();
         }
     }
     if (y + 1 < s) {
-        if (checkAlive(!whosTurn(), x, y + 1)) {
-            removeGroup();
+        if (checkAlive(!whosTurn(), x, y + 1) > 0) {
+            killed += removeGroup();
             resetHelper();
         }
     }
     if (y - 1 >= 0) {
-        if (checkAlive(!whosTurn(), x, y - 1)) {
-            removeGroup();
+        if (checkAlive(!whosTurn(), x, y - 1) > 0) {
+            killed += removeGroup();
             resetHelper();
         }
     }
+
+    //finally, make sure you haven't killed your own group
+    //which is an invalid move
+    if (checkAlive(whosTurn(), x, y) > 0) {
+        board[x][y]->setStatus(EMPTY, false);
+        return;
+    }
+
     turn++;
+    //do something with killed here?
 }
 
 int Board::whosTurn() {
