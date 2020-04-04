@@ -14,7 +14,7 @@ Stone::Stone(bool opaque, int COLOUR, qreal x, qreal y, qreal width, qreal heigh
         brush.setColor(Qt::black);
         setBrush(brush);
     }
-    else {
+    else if (COLOUR == WHITE){
         pen.setStyle(Qt::SolidLine);
         pen.setBrush(Qt::white);
         pen.setWidth(2);

@@ -16,9 +16,6 @@ Intersection::Intersection(Qt::GlobalColor colour, qreal x, qreal y, qreal width
     brush.setStyle(Qt::SolidPattern);
     brush.setColor(colour);
     setBrush(brush);
-
-    setAcceptHoverEvents(true);
-    setAcceptedMouseButtons(Qt::LeftButton);
 }
 
 int Intersection::status() {
@@ -30,12 +27,16 @@ bool Intersection::permanent() {
 }
 
 void Intersection::setStatus(int COLOUR, bool permanent) {
-    state = COLOUR;
     hoverstate = permanent;
-    if (COLOUR != EMPTY) {
-        stone = new Stone(permanent, COLOUR, -25, -25, 50, 50, this);
+    if (COLOUR != EMPTY && permanent) {
+        state = COLOUR;
+        stone = new Stone(true, COLOUR, -25, -25, 50, 50, this);
+    }
+    else if (COLOUR != EMPTY && !permanent) {
+        stone = new Stone(false, COLOUR, -25, -25, 50, 50, this);
     }
     else if (COLOUR == EMPTY) {
+        state = EMPTY;
         delete stone;
         stone = nullptr;
     }

@@ -89,6 +89,7 @@ int Board::placeStone(int COLOUR, int x, int y) {
             //can't place on already existing spot
         }
     }
+    removeHoverStone(x, y);
     board[x][y]->setStatus(COLOUR, true);
     return 0;
 }
@@ -178,6 +179,8 @@ void Board::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
     QPointF position = event->lastScenePos();
 
     //convert coordinates into array indexes
+    //the other way is setting hover enter event for intersection
+    //but then to get stone colour intersection would need to get info from board
     int x = (int) std::round(((position.x())/ 51) - 0.5);
     int y = (int) std::round(((position.y())/ 51) - 0.5);
 
@@ -188,25 +191,27 @@ void Board::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
         hovery = y;
         hoverStone(whosTurn(), hoverx, hovery);
     }
+    //if mouse is in a new position
     else if (x != hoverx || y != hovery) {
-        switch (board[hoverx][hovery]->permanent()) {
-        case true:
-            break;
-        case false:
+        //if the old position was a hoverstone (aka not a placed one)
+        //remove it
+        if (!board[hoverx][hovery]->permanent()) {
             removeHoverStone(hoverx, hovery);
         }
-        switch (board[x][y]->permanent()) {
-        case true:
-            break;
-        case false:
+        //if the new position was not a placed stone
+        //put a hover stone there
+        if (!board[x][y]->permanent()) {
             hoverStone(whosTurn(), x, y);
         }
+        //update mouse position indexes
         hoverx = x;
         hovery = y;
     }
 }
 
 void Board::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+
+    //debug at any time by setting a breakpoint here
     if (event->button() == Qt::RightButton) {
         return;
     }
