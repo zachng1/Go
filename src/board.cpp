@@ -94,7 +94,7 @@ int Board::placeStone(int COLOUR, int x, int y) {
 }
 
 //return 0 if group is alive and -1 if you are checking an empty group
-//if group is dead, removes group and returns size of group removed
+//if group is dead, return 1 and helper will be set with group to kill
 int Board::checkAlive(int GROUPCOLOUR, int x, int y) {
     if (GROUPCOLOUR != WHITE && GROUPCOLOUR != BLACK) return -1; //shouldn't be checking non w/b group: don't need to reset helper bc will only happen on first call
     //final return condition -- if we never reach an empty square group is dead
@@ -110,6 +110,7 @@ int Board::checkAlive(int GROUPCOLOUR, int x, int y) {
     if (x + 1 < s + 1) {
         if (board[x + 1][y]->status() != !GROUPCOLOUR && !helper[x+1][y]) {
             if (!checkAlive(GROUPCOLOUR, x + 1, y)) {
+                resetHelper();
                 return 0;
             }
         }
@@ -117,6 +118,7 @@ int Board::checkAlive(int GROUPCOLOUR, int x, int y) {
     if (x - 1 >= 0) {
         if (board[x - 1][y]->status() != !GROUPCOLOUR && !helper[x-1][y]) {
             if (!checkAlive(GROUPCOLOUR, x - 1, y)) {
+                resetHelper();
                 return 0;
             }
         }
@@ -124,6 +126,7 @@ int Board::checkAlive(int GROUPCOLOUR, int x, int y) {
     if (y - 1 >= 0) { 
         if (board[x][y - 1]->status() != !GROUPCOLOUR && !helper[x][y-1]) {
             if (!checkAlive(GROUPCOLOUR, x, y - 1)) {
+                resetHelper();
                 return 0;
             }
         }
@@ -131,16 +134,15 @@ int Board::checkAlive(int GROUPCOLOUR, int x, int y) {
     if (y + 1 < s + 1) {
         if (board[x][y + 1]->status() != !GROUPCOLOUR && !helper[x][y+1]) {
             if (!checkAlive(GROUPCOLOUR, x, y + 1)) {
+                resetHelper();
                 return 0;
             }
         }
     }
-    int removed = removeGroup();
-    return removed;
+    return 1;
 }
 
 int Board::removeGroup() {
-    std::cout << "removing" << std::endl;
     int removed = 0;
     for (int i = 0; i < s + 1; i++) {
         for (int j = 0; j < s + 1; j++) {
@@ -187,11 +189,17 @@ void Board::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
         hoverStone(whosTurn(), hoverx, hovery);
     }
     else if (x != hoverx || y != hovery) {
-        if (!board[hoverx][hovery]->permanent()) {
+        switch (board[hoverx][hovery]->permanent()) {
+        case true:
+            break;
+        case false:
             removeHoverStone(hoverx, hovery);
-            hoverx = x;
-            hovery = y;
-            hoverStone(whosTurn(), hoverx, hovery);
+        }
+        switch (board[x][y]->permanent()) {
+        case true:
+            break;
+        case false:
+            hoverStone(whosTurn(), x, y);
         }
         hoverx = x;
         hovery = y;
@@ -199,6 +207,9 @@ void Board::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
 }
 
 void Board::mousePressEvent(QGraphicsSceneMouseEvent *event) {
+    if (event->button() == Qt::RightButton) {
+        return;
+    }
     QPointF position = event->lastScenePos();
     //convert coordinates into array indexes
     int x = (int) std::round(((position.x())/ 51) - 0.5);
@@ -210,22 +221,29 @@ void Board::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     placeStone(whosTurn(), x, y);
 
     if (x + 1 < s) {
-        std::cout << checkAlive(!whosTurn(), x + 1, y);
-        resetHelper();
+        if (checkAlive(!whosTurn(), x + 1, y)) {
+            removeGroup();
+            resetHelper();
+        }
     }
     if (x - 1 >= 0) {
-        std::cout << checkAlive(!whosTurn(), x - 1, y);
-        resetHelper();
+        if (checkAlive(!whosTurn(), x - 1, y)) {
+            removeGroup();
+            resetHelper();
+        }
     }
     if (y + 1 < s) {
-        std::cout << checkAlive(!whosTurn(), x, y + 1);
-        resetHelper();
+        if (checkAlive(!whosTurn(), x, y + 1)) {
+            removeGroup();
+            resetHelper();
+        }
     }
     if (y - 1 >= 0) {
-        std::cout << checkAlive(!whosTurn(), x, y - 1);
-        resetHelper();
+        if (checkAlive(!whosTurn(), x, y - 1)) {
+            removeGroup();
+            resetHelper();
+        }
     }
-    std::cout << std::endl;
     turn++;
 }
 
