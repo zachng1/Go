@@ -1,8 +1,12 @@
 #include "board.h"
 #include <QtWidgets>
 
+
+//at some point I plan to separate the board functionality
+//from the board graphics...
+
 Board::Board(int s) :
-    QGraphicsRectItem(0, 0, ((s + 1) * (50 + 2)), ((s + 1) * (50 + 2))),
+    QGraphicsRectItem(0, 0, ((s + 1) * (50 + 1)), ((s + 1) * (50 + 1))),
     squares(std::vector<std::vector<Square *>> (s, std::vector<Square *> (s, nullptr))),
     board(std::vector<std::vector<Intersection *>> (s + 1, std::vector<Intersection *> (s + 1, nullptr))),
     helper(std::vector<std::vector<bool>> (s + 1, std::vector<bool> (s + 1, false))),
@@ -26,6 +30,8 @@ Board::Board(int s) :
            squares[j][i] = new Square(((j + 0.5) * 51) + 1, ((i + 0.5) * 51) + 1, 50, 50, this);
         }
     }
+
+    //add some math to cater for other sizes..
     for (int i = 0; i < s + 1; i++) {
         for (int j = 0 ; j < s + 1; j++) {
             //setting up corner intersections
@@ -211,8 +217,9 @@ void Board::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
 
 void Board::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
-    //debug at any time by setting a breakpoint here
+    //pass
     if (event->button() == Qt::RightButton) {
+        turn++;
         return;
     }
     int killed = 0;
@@ -272,4 +279,28 @@ int Board::whosTurn() {
         return BLACK;
     }
     else return WHITE;
+}
+
+int Board::bscore() {
+    int a = 0;
+    for (int i = 0; i < s + 1; i++) {
+        for (int j = 0; j < s + 1; j++) {
+            if (board[j][i]->status() == BLACK) {
+                a++;
+            }
+        }
+    }
+    return a;
+}
+
+int Board::wscore() {
+    int a = 0;
+    for (int i = 0; i < s + 1; i++) {
+        for (int j = 0; j < s + 1; j++) {
+            if (board[j][i]->status() == WHITE) {
+                a++;
+            }
+        }
+    }
+    return a;
 }

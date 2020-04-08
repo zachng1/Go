@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QWidget>
+#include <QGraphicsScene>
 #include <QGraphicsView>
 #include "board.h"
 #include "game.h"
@@ -16,10 +17,15 @@ public:
 signals:
 
 public slots:
+    void reset();
+    void resize(int s);
+    void score();
 
 private:
+    void setupMenu();
+    void setupStatusBar();
     Game * game;
-    QGraphicsView * view;
+    int size;
 
 };
 

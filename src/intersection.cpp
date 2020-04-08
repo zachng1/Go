@@ -28,14 +28,15 @@ bool Intersection::permanent() {
 
 void Intersection::setStatus(int COLOUR, bool permanent) {
     hoverstate = permanent;
-    state = COLOUR;
     if (COLOUR != EMPTY && permanent) {
+        state = COLOUR;
         stone = new Stone(true, COLOUR, -25, -25, 50, 50, this);
     }
     else if (COLOUR != EMPTY && !permanent) {
         stone = new Stone(false, COLOUR, -25, -25, 50, 50, this);
     }
     else if (COLOUR == EMPTY) {
+        state = COLOUR;
         delete stone;
         stone = nullptr;
     }

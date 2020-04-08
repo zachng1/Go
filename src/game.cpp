@@ -2,9 +2,34 @@
 
 #include <QWidget>
 
-Game::Game(QObject * parent) : QGraphicsScene(parent), b(new Board(18))
+Game::Game(int s, QWidget * parent) : QGraphicsView(parent),
+    scene(new QGraphicsScene),
+    b(new Board(s)),
+    pass(0)
 {
-    this->addItem(b);
+    scene->addItem(b);
+    setScene(scene);
 }
 
+void Game::mousePressEvent(QMouseEvent *event) {
+    if (event->button()==Qt::RightButton) {
+        pass++;
+    }
+    else if (event->button()==Qt::LeftButton) {
+        pass = 0;
+    }
+    QGraphicsView::mousePressEvent(event);
+}
 
+int Game::passes(){
+    return pass;
+}
+
+int Game::bscore() {
+    int s = b->bscore();
+    return s;
+}
+int Game::wscore() {
+    int s = b->wscore();
+    return s;
+}

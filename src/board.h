@@ -17,7 +17,9 @@ class Board : public QGraphicsRectItem {
     Board(int s);
     ~Board();
 
-
+    int bscore();
+    int wscore();
+    private:
     void hoverStone(int COLOUR, int x, int y);
     void removeHoverStone(int x, int y);
     int placeStone(int COLOUR, int x, int y);
@@ -28,11 +30,11 @@ class Board : public QGraphicsRectItem {
 
     //implemented here bc other option was in intersection class
     //got messy when needing to access turn state
-    void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
-    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     int whosTurn();
 
-    private:
+
     std::vector<std::vector<Square *>> squares;
     std::vector<std::vector<Intersection *>> board;
     std::vector<std::vector<bool>> helper;
