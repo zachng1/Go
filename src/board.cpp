@@ -226,29 +226,33 @@ void Board::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
     placeStone(whosTurn(), x, y);
 
-    if (x + 1 < s) {
-        if (checkAlive(!whosTurn(), x + 1, y) > 0) {
+    if (x + 1 < s + 1) {
+        if (board[x+1][y]->status() == !whosTurn() &&
+                checkAlive(!whosTurn(), x + 1, y) > 0) {
             killed += removeGroup();
-            resetHelper();
         }
+        resetHelper();
     }
     if (x - 1 >= 0) {
-        if (checkAlive(!whosTurn(), x - 1, y) > 0) {
+        if (board[x-1][y]->status() == !whosTurn() &&
+                checkAlive(!whosTurn(), x - 1, y) > 0) {
             killed += removeGroup();
-            resetHelper();
         }
+        resetHelper();
     }
-    if (y + 1 < s) {
-        if (checkAlive(!whosTurn(), x, y + 1) > 0) {
+    if (y + 1 < s + 1) {
+        if (board[x][y+1]->status() == !whosTurn() &&
+                checkAlive(!whosTurn(), x, y + 1) > 0) {
             killed += removeGroup();
-            resetHelper();
         }
+        resetHelper();
     }
     if (y - 1 >= 0) {
-        if (checkAlive(!whosTurn(), x, y - 1) > 0) {
+        if (board[x][y-1]->status() == !whosTurn() &&
+                checkAlive(!whosTurn(), x, y - 1) > 0) {
             killed += removeGroup();
-            resetHelper();
         }
+        resetHelper();
     }
 
     //finally, make sure you haven't killed your own group
@@ -257,6 +261,7 @@ void Board::mousePressEvent(QGraphicsSceneMouseEvent *event) {
         board[x][y]->setStatus(EMPTY, false);
         return;
     }
+    resetHelper();
 
     turn++;
     //do something with killed here?
