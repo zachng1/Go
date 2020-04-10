@@ -19,7 +19,7 @@ signals:
 public slots:
     void reset();
     void resize(int s);
-    void score();
+    //void score();
 
 private:
     void setupMenu();

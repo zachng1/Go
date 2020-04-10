@@ -24,7 +24,7 @@ void MainWindow::resize(int s) {
     reset();
 }
 
-void MainWindow::score() {
+/*void MainWindow::score() {
     int bs = game->bscore();
     int ws = game->wscore();
     std::cout << bs << ws << std::endl;
@@ -35,7 +35,7 @@ void MainWindow::score() {
     dialog->setMinimumSize(150, 75);
     QLabel * score = new QLabel(qscoreText, dialog);
     dialog->exec();
-}
+}*/
 
 void MainWindow::setupMenu() {
     QMenu * gameMenu = menuBar()->addMenu("Game");
@@ -63,9 +63,9 @@ void MainWindow::setupMenu() {
 
     gameMenu->addMenu(changeSize);
 
-    QAction * score = new QAction("Score");
+    /*QAction * score = new QAction("Score");
     connect(score, &QAction::triggered, this, &MainWindow::score);
-    gameMenu->addAction(score);
+    gameMenu->addAction(score);*/
 }
 
 void MainWindow::setupStatusBar(){

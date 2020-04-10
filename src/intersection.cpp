@@ -27,7 +27,9 @@ bool Intersection::permanent() {
 }
 
 void Intersection::setStatus(int COLOUR, bool permanent) {
+    if (stone != nullptr) delete stone;
     hoverstate = permanent;
+
     if (COLOUR != EMPTY && permanent) {
         state = COLOUR;
         stone = new Stone(true, COLOUR, -25, -25, 50, 50, this);
@@ -37,7 +39,6 @@ void Intersection::setStatus(int COLOUR, bool permanent) {
     }
     else if (COLOUR == EMPTY) {
         state = COLOUR;
-        delete stone;
         stone = nullptr;
     }
 }
