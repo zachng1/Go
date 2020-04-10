@@ -6,6 +6,8 @@ Requires QT 5.14.2
 
 Compile go.pro using qmake.
 
+Alternatively clone the build folder and run go.exe if you are on Windows -- hopefully!
+
 ## Rules
 The rules of Go are simple. Take turns placing stones on the board. 
 If a stone or a group of stones is surrounded on all sides by the other player's colour (or the edges of the board), it is dead, and taken off the board.
