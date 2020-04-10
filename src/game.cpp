@@ -69,6 +69,8 @@ void Game::mousePressEvent(QMouseEvent *event) {
         //which is an invalid move
         if (checkAlive(whosTurn(), x, y) > 0) {
             board->placeStone(EMPTY, x, y);
+            resetHelper();
+            return;
         }
         resetHelper();
 
