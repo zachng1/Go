@@ -23,12 +23,19 @@ public:
     Game(int s, QWidget * parent = nullptr);
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    int whosTurn();
+
+    int score(int COLOUR);
+    void resize(int size);
+
+
+public slots:
+    void reset();
 
 signals:
-    int XCoord();
-    int YCoord();
-    int passes();
-    int whosTurn();
+    int coords(int x, int y);
+    int gameOver();
+    int turnChange(int turn);
 
 
 private:

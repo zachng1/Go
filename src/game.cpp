@@ -18,7 +18,11 @@ void Game::mousePressEvent(QMouseEvent *event) {
     if (event->button()==Qt::RightButton) {
         pass++;
         turn++;
-        //if pass == 2, end game
+        if (pass == 2) {
+            emit gameOver();
+            return;
+        }
+        emit turnChange(whosTurn());
     }
     else if (event->button()==Qt::LeftButton) {
         pass = 0;
@@ -64,14 +68,12 @@ void Game::mousePressEvent(QMouseEvent *event) {
         //finally, make sure you haven't killed your own group
         //which is an invalid move
         if (checkAlive(whosTurn(), x, y) > 0) {
-            std::cout << "oop" << std::endl;
             board->placeStone(EMPTY, x, y);
-            return;
         }
         resetHelper();
 
         turn++;
-        //do something with killed here?
+        emit turnChange(whosTurn());
     }
     QGraphicsView::mousePressEvent(event);
 }
@@ -107,11 +109,8 @@ void Game::mouseMoveEvent(QMouseEvent *event) {
         //update mouse position indexes
         hoverx = x;
         hovery = y;
+        emit coords(hoverx, hovery);
     }
-}
-
-int Game::passes(){
-    return pass;
 }
 
 int Game::checkAlive(int GROUPCOLOUR, int x, int y){
@@ -185,4 +184,34 @@ int Game::whosTurn() {
         return BLACK;
     }
     else return WHITE;
+}
+
+void Game::resize(int size) {
+    s = size;
+    reset();
+}
+
+void Game::reset() {
+    scene->removeItem(board);
+    delete board;
+    delete scene;
+    board = new Board(s);
+    scene = new QGraphicsScene(this);
+    scene->addItem(board);
+    setScene(scene);
+    turn=0;
+    pass=0;
+    emit turnChange(whosTurn());
+}
+
+int Game::score(int COLOUR) {
+    int sc = 0;
+    for (int i = 0; i < s+1; i++) {
+        for (int j = 0; j < s+1; j++) {
+            if (board->checkPosStatus(COLOUR, j, i)) {
+                sc++;
+            }
+        }
+    }
+    return sc;
 }

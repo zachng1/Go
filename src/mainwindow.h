@@ -7,6 +7,9 @@
 #include <QGraphicsView>
 #include "board.h"
 #include "game.h"
+#include "statusbarwidgets/xyinfo.h"
+#include "statusbarwidgets/turninfo.h"
+#include "gameoverbox.h"
 
 class MainWindow : public QMainWindow
 {
@@ -17,15 +20,14 @@ public:
 signals:
 
 public slots:
-    void reset();
-    void resize(int s);
-    //void score();
+    void score();
 
 private:
     void setupMenu();
     void setupStatusBar();
     Game * game;
     int size;
+    GameOverBox * gameover;
 
 };
 
