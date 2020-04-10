@@ -19,6 +19,6 @@ See https://en.wikipedia.org/wiki/Rules_of_Go for more detail.
 ## Usage
 Click to place a stone, black goes first. Right click to pass.
 
-When both players decide the game is over, use the score option in the Game menu to see who won. 
+When both players pass consecutively, the score will be displayed.
 
 You can also restart or change the size of the board in the Game menu. (Board resizing is in progress, currently does not display corner intersections properly.
