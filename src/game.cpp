@@ -77,7 +77,7 @@ void Game::mousePressEvent(QMouseEvent *event) {
         turn++;
         emit turnChange(whosTurn());
     }
-    QGraphicsView::mousePressEvent(event);
+    else QGraphicsView::mousePressEvent(event);
 }
 
 void Game::mouseMoveEvent(QMouseEvent *event) {
@@ -161,6 +161,7 @@ int Game::checkAlive(int GROUPCOLOUR, int x, int y){
     }
     return 1;
 }
+
 int Game::removeGroup() {
     int removed = 0;
     for (int i = 0; i < s + 1; i++) {

@@ -28,7 +28,6 @@ public:
     int score(int COLOUR);
     void resize(int size);
 
-
 public slots:
     void reset();
 

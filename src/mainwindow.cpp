@@ -5,7 +5,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     game(new Game(18, this)),
     size(18),
-    gameover(new GameOverBox(this))
+    gameover(new GameOverBox(this)),
+    jd{new JoinDialog},
+    hd{new HostDialog}
 {
     setCentralWidget(game);
 
@@ -13,7 +15,6 @@ MainWindow::MainWindow(QWidget *parent) :
     setupStatusBar();
     connect(game, &Game::gameOver, this, &MainWindow::score);
     connect(gameover, &GameOverBox::closed, game, &Game::reset);
-
 }
 
 
@@ -44,6 +45,18 @@ void MainWindow::setupMenu() {
     changeSize->addAction(nine);
 
     gameMenu->addMenu(changeSize);
+
+    //now online stuff
+
+    QMenu * onlineMenu = menuBar()->addMenu("Online");
+    join = new QAction("Join Game");
+    connect(join, &QAction::triggered, this, &MainWindow::clientJoin);
+    onlineMenu->addAction(join);
+
+    host = new QAction("Host a Match");
+    connect(host, &QAction::triggered, this, &MainWindow::serverHost);
+    onlineMenu->addAction(host);
+
 }
 
 void MainWindow::setupStatusBar(){
@@ -63,4 +76,28 @@ void MainWindow::score() {
     int black = game->score(BLACK);
     int white = game->score(WHITE);
     gameover->show(black, white);
+}
+
+void MainWindow::clientJoin() {
+    join->setDisabled(true);
+    host->setDisabled(true);
+    game->deleteLater();
+    game = new GameClient(18);
+    setCentralWidget(game);
+    jd->exec();
+    if (jd->result() == QDialog::Rejected) {
+        return;
+    }
+    ((GameClient *) game)->connectHost(jd->address(), jd->port());
+}
+
+void MainWindow::serverHost() {
+    join->setDisabled(true);
+    host->setDisabled(true);
+    game->deleteLater();
+    game = new GameHost(18);
+    setCentralWidget(game);
+    ((GameHost *) game)->host();
+    connect(((GameHost *)game), &GameHost::listening, hd, &HostDialog::display);
+    connect(((GameHost *)game), &GameHost::connection, hd, &QDialog::accept);
 }

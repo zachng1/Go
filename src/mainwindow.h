@@ -9,7 +9,11 @@
 #include "game.h"
 #include "statusbarwidgets/xyinfo.h"
 #include "statusbarwidgets/turninfo.h"
-#include "gameoverbox.h"
+#include "dialogs/gameoverbox.h"
+#include "dialogs/joindialog.h"
+#include "dialogs/hostdialog.h"
+#include "gameclient.h"
+#include "gamehost.h"
 
 class MainWindow : public QMainWindow
 {
@@ -21,6 +25,8 @@ signals:
 
 public slots:
     void score();
+    void clientJoin();
+    void serverHost();
 
 private:
     void setupMenu();
@@ -28,6 +34,13 @@ private:
     Game * game;
     int size;
     GameOverBox * gameover;
+    JoinDialog * jd;
+    HostDialog * hd;
+
+    QAction * join;
+    QAction * host;
+
+
 
 };
 

@@ -1,7 +1,7 @@
 TEMPLATE = app
 TARGET = go
 
-QT = core gui
+QT = core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -14,7 +14,12 @@ DISTFILES += \
 
 HEADERS += \
     src/board.h \
-    src/gameoverbox.h \
+    src/dialogs/gameoverbox.h \
+    src/dialogs/hostdialog.h \
+    src/dialogs/joindialog.h \
+    src/gameclient.h \
+    src/gamehost.h \
+    src/gameonline.h \
     src/mainwindow.h \
     src/square.h \
     src/enum.h \
@@ -26,7 +31,12 @@ HEADERS += \
 
 SOURCES += \
     src/board.cpp \
-    src/gameoverbox.cpp \
+    src/dialogs/gameoverbox.cpp \
+    src/dialogs/hostdialog.cpp \
+    src/dialogs/joindialog.cpp \
+    src/gameclient.cpp \
+    src/gamehost.cpp \
+    src/gameonline.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
     src/square.cpp \
