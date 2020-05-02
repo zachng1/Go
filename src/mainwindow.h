@@ -27,6 +27,7 @@ public slots:
     void score();
     void clientJoin();
     void serverHost();
+    void closeServer();
 
 private:
     void setupMenu();

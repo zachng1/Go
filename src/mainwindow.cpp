@@ -89,6 +89,9 @@ void MainWindow::clientJoin() {
         return;
     }
     ((GameClient *) game)->connectHost(jd->address(), jd->port());
+
+    connect(game, &Game::gameOver, this, &MainWindow::score);
+    connect(gameover, &GameOverBox::closed, game, &Game::reset);
 }
 
 void MainWindow::serverHost() {
@@ -96,8 +99,22 @@ void MainWindow::serverHost() {
     host->setDisabled(true);
     game->deleteLater();
     game = new GameHost(18);
-    setCentralWidget(game);
-    ((GameHost *) game)->host();
     connect(((GameHost *)game), &GameHost::listening, hd, &HostDialog::display);
     connect(((GameHost *)game), &GameHost::connection, hd, &QDialog::accept);
+
+    connect(game, &Game::gameOver, this, &MainWindow::score);
+    connect(gameover, &GameOverBox::closed, game, &Game::reset);
+
+    connect(hd, &QDialog::rejected, this, &MainWindow::closeServer);
+    setCentralWidget(game);
+    ((GameHost *) game)->host();
+}
+
+void MainWindow::closeServer() {
+    join->setDisabled(false);
+    host->setDisabled(false);
+    game->deleteLater();
+    game = new Game(18);
+    connect(game, &Game::gameOver, this, &MainWindow::score);
+    connect(gameover, &GameOverBox::closed, game, &Game::reset);
 }

@@ -2,21 +2,21 @@
 
 JoinDialog::JoinDialog(QWidget * parent) : QDialog(parent)
 {
-    QFormLayout layout;
+    QFormLayout * layout = new QFormLayout;
     a = new QLineEdit();
     p = new QLineEdit();
-    p->setInputMask("DDDD");
-    a->setInputMask("000.000.000");
-    layout.addRow("IP Address", a);
-    layout.addRow("Port", p);
+    p->setInputMask("00000");
+    a->setInputMask("000.000.000.000");
+    layout->addRow("IP Address", a);
+    layout->addRow("Port", p);
 
     buttonbox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     connect(buttonbox, &QDialogButtonBox::accepted,
             this, &QDialog::accept);
     connect(buttonbox, &QDialogButtonBox::rejected,
             this, &QDialog::reject);
-    layout.addRow(buttonbox);
-    setLayout(&layout);
+    layout->addRow(buttonbox);
+    setLayout(layout);
 }
 
 QString JoinDialog::address() {

@@ -10,8 +10,17 @@ GameHost::GameHost(int s, QWidget * parent) : GameOnline(s, parent),
 }
 
 void GameHost::host() {
-    server->listen();
-    emit listening(server->serverAddress(), server->serverPort());
+    if (server->listen()) {
+        const QHostAddress &localhost = QHostAddress(QHostAddress::LocalHost);
+        QHostAddress a = localhost;
+        for (const QHostAddress &address: QNetworkInterface::allAddresses()) {
+            if (address.protocol() == QAbstractSocket::IPv4Protocol && address != localhost) {
+                a = address;
+            }
+        }
+        emit listening(a, server->serverPort());
+    }
+    else printf("Error listening");
 }
 
 void GameHost::clientJoin() {

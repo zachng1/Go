@@ -18,6 +18,7 @@ public:
 
 public slots:
     void socketEvent();
+    void swapTurn(int COLOUR);
 signals:
 
 private:

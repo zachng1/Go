@@ -6,6 +6,8 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QDataStream>
+#include <QNetworkInterface>
+#include <QAbstractSocket>
 
 class GameHost : public GameOnline
 {
