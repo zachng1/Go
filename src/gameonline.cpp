@@ -24,7 +24,7 @@ void GameOnline::setTurn(bool turn) {
 }
 
 //takes COLOUR arg so can connect to
-//Game::turnChange
+//Game::turnChange(int COLOUR) signal
 void GameOnline::swapTurn(int COLOUR) {
     //qDebug() << "turn change";
     myturn = !myturn;
@@ -53,8 +53,18 @@ void GameOnline::socketEvent() {
     //qDebug() << "Ready read";
     if (!socketdstream.commitTransaction()) return;
     else {
-        Game::mousePressEvent(new QMouseEvent(type, localPos, button, buttons, modifiers));
-        //qDebug() << "Receive:" << type << localPos << button << buttons << modifiers;
+        QMouseEvent * event = new QMouseEvent(type, localPos, button, buttons, modifiers);
+        switch(type) {
+        case QEvent::MouseButtonPress:
+            Game::mousePressEvent(event);
+            return;
+        case QEvent::MouseMove:
+            Game::mouseMoveEvent(event);
+            return;
+        default:
+            Game::event(event);
+            return;
+        }
     }
 }
 
@@ -67,6 +77,7 @@ void GameOnline::mousePressEvent(QMouseEvent * event) {
 
 void GameOnline::mouseMoveEvent(QMouseEvent *event) {
     if (myturn) {
+        sendMouseEvent(event);
         Game::mouseMoveEvent(event);
     }
 }
