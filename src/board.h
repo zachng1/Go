@@ -26,6 +26,9 @@ class Board : public QGraphicsRectItem {
 
 
 
+
+
+
     std::vector<std::vector<Square *>> squares;
     std::vector<std::vector<Intersection *>> board;
     int s;

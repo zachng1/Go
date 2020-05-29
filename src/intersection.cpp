@@ -32,10 +32,10 @@ void Intersection::setStatus(int COLOUR, bool permanent) {
 
     if (COLOUR != EMPTY && permanent) {
         state = COLOUR;
-        stone = new Stone(true, COLOUR, -25, -25, 50, 50, this);
+        stone = new Stone(true, COLOUR, -25, -25, 50, 50, this); //make_updateable
     }
     else if (COLOUR != EMPTY && !permanent) {
-        stone = new Stone(false, COLOUR, -25, -25, 50, 50, this);
+        stone = new Stone(false, COLOUR, -25, -25, 50, 50, this); //make_updateable
     }
     else if (COLOUR == EMPTY) {
         state = COLOUR;

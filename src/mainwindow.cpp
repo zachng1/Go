@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     hd{new HostDialog}
 {
     setCentralWidget(game);
+    //game->fitInView(game->sceneRect(), Qt::KeepAspectRatio);
 
     setupMenu();
     setupStatusBar();
@@ -117,4 +118,8 @@ void MainWindow::closeServer() {
     game = new Game(18);
     connect(game, &Game::gameOver, this, &MainWindow::score);
     connect(gameover, &GameOverBox::closed, game, &Game::reset);
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event) {
+    game->fitInView(game->sceneRect(), Qt::KeepAspectRatio);
 }

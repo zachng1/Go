@@ -30,8 +30,10 @@ public slots:
     void closeServer();
 
 private:
+    void resizeEvent(QResizeEvent *event) override;
     void setupMenu();
     void setupStatusBar();
+
     Game * game;
     int size;
     GameOverBox * gameover;

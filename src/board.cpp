@@ -18,7 +18,7 @@ Board::Board(int s) :
     //set up squares and intersection points
     for (int i = 0; i < s; i++) {
         for (int j = 0; j < s; j++) {
-           squares[j][i] = new Square(((j + 0.5) * 51) + 1, ((i + 0.5) * 51) + 1, 50, 50, this);
+           squares[j][i] = new Square(((j + 0.5) * (50 + 1)) + 1, ((i + 0.5) * (50 + 1)) + 1, 50, 50, this);
         }
     }
 
@@ -36,11 +36,11 @@ Board::Board(int s) :
                 (j == 15 && i == 9) ||
                     (j == 15 && i == 15)) {
                 board[j][i] = new Intersection(Qt::black, -10, -10, 20, 20, this);
-                board[j][i]->setPos((((double) j + 0.5) * 51), (((double)i + 0.5) * 51));
+                board[j][i]->setPos((((double) j + 0.5) * (50 + 1)), (((double)i + 0.5) * (50 + 1)));
             }
             else {
                 board[j][i] = new Intersection(Qt::transparent, -10, -10, 20, 20, this);
-                board[j][i]->setPos((((double)j + 0.5) * 51), (((double)i + 0.5) * 51));
+                board[j][i]->setPos((((double)j + 0.5) * (50 + 1)), (((double)i + 0.5) * (50 + 1)));
             }
         }
     }
