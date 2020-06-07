@@ -15,8 +15,9 @@ class GameHost : public GameOnline
 public:
     GameHost(int s, QWidget * parent = nullptr);
 public slots:
-    void host();
+    int host();
     void clientJoin();
+    //void sendSize();
 signals:
     void connection();
     void listening(QHostAddress address, quint16 port);

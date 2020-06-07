@@ -7,17 +7,25 @@ MainWindow::MainWindow(QWidget *parent) :
     size(18),
     gameover(new GameOverBox(this)),
     jd{new JoinDialog},
-    hd{new HostDialog}
+    hd{new HostDialog},
+    error{new QErrorMessage},
+    xy{new XYinfo},
+    turn{new TurnInfo}
 {
-    setCentralWidget(game);
-    //game->fitInView(game->sceneRect(), Qt::KeepAspectRatio);
-
     setupMenu();
     setupStatusBar();
-    connect(game, &Game::gameOver, this, &MainWindow::score);
-    connect(gameover, &GameOverBox::closed, game, &Game::reset);
+    setupGame();
 }
 
+void MainWindow::setupGame() {
+    if (game == nullptr) return;
+    connect(game, &Game::gameOver, this, &MainWindow::score);
+    connect(gameover, &GameOverBox::closed, game, &Game::reset);
+    connect(game, &Game::turnChange, turn, &TurnInfo::update);
+    setCentralWidget(game);
+
+    //need to add setupMenu logic here
+}
 
 
 void MainWindow::setupMenu() {
@@ -32,22 +40,31 @@ void MainWindow::setupMenu() {
 
     QAction * nineteen = new QAction("19");
     connect(nineteen, &QAction::triggered, this,
-            [&](){this->game->resize(18);});
+            [&](){
+        this->game->resize(18);
+        this->resizeEvent(nullptr);
+    });
     changeSize->addAction(nineteen);
 
     QAction * thirteen = new QAction("13");
     connect(thirteen, &QAction::triggered, this,
-            [&](){this->game->resize(12);});
+            [&](){
+        this->game->resize(12);
+        this->resizeEvent(nullptr);
+    });
     changeSize->addAction(thirteen);
 
     QAction * nine = new QAction("9");
     connect(nine, &QAction::triggered, this,
-            [&](){this->game->resize(8);});
+            [&](){
+        this->game->resize(8);
+        this->resizeEvent(nullptr);
+    });
     changeSize->addAction(nine);
 
     gameMenu->addMenu(changeSize);
 
-    //now online stuff
+    // online stuff here
 
     QMenu * onlineMenu = menuBar()->addMenu("Online");
     join = new QAction("Join Game");
@@ -64,13 +81,8 @@ void MainWindow::setupStatusBar(){
 
     QStatusBar * statusbar = statusBar();
 
-    XYinfo * xy = new XYinfo;
     statusbar->addPermanentWidget(xy);
-    connect(game, &Game::coords, xy, &XYinfo::update);
-
-    TurnInfo * turn = new TurnInfo;
     statusbar->addPermanentWidget(turn);
-    connect(game, &Game::turnChange, turn, &TurnInfo::update);
 }
 
 void MainWindow::score() {
@@ -82,33 +94,56 @@ void MainWindow::score() {
 void MainWindow::clientJoin() {
     join->setDisabled(true);
     host->setDisabled(true);
-    game->deleteLater();
-    game = new GameClient(18);
-    setCentralWidget(game);
     jd->exec();
     if (jd->result() == QDialog::Rejected) {
+        join->setDisabled(false);
+        host->setDisabled(false);
         return;
     }
-    ((GameClient *) game)->connectHost(jd->address(), jd->port());
-
-    connect(game, &Game::gameOver, this, &MainWindow::score);
-    connect(gameover, &GameOverBox::closed, game, &Game::reset);
+    else {
+        game->deleteLater();
+        game = new GameClient(18);
+        connect(((GameOnline *)game), &GameOnline::error,
+                this, &MainWindow::onlineErrorHandler);
+        ((GameClient *) game)->connectHost(jd->address(), jd->port());
+        setupGame();
+        resizeEvent(nullptr);
+    }
 }
 
 void MainWindow::serverHost() {
     join->setDisabled(true);
     host->setDisabled(true);
+    //int onlineSize = game->size(); (I thought I could implement some kind of size sharing mechanism between the two
+    // I thought wrong/not ready to implement it this afternoon..
+
     game->deleteLater();
     game = new GameHost(18);
-    connect(((GameHost *)game), &GameHost::listening, hd, &HostDialog::display);
-    connect(((GameHost *)game), &GameHost::connection, hd, &QDialog::accept);
-
-    connect(game, &Game::gameOver, this, &MainWindow::score);
-    connect(gameover, &GameOverBox::closed, game, &Game::reset);
+    connect(((GameHost *)game), &GameHost::listening,
+            hd, &HostDialog::display);
+    connect(((GameHost *)game), &GameHost::connection,
+            hd, &QDialog::accept);
+    connect(((GameOnline *)game), &GameOnline::error,
+            this, &MainWindow::onlineErrorHandler);
 
     connect(hd, &QDialog::rejected, this, &MainWindow::closeServer);
-    setCentralWidget(game);
-    ((GameHost *) game)->host();
+    resizeEvent(nullptr);
+    if (((GameHost *) game)->host() < 0) {
+        onlineErrorHandler();
+        return;
+    }
+    else {
+        setupGame();
+        resizeEvent(nullptr);
+    }
+}
+
+void MainWindow::onlineErrorHandler() {
+    error->showMessage("There was an error with online play.\n Resetting to local mode.");
+    game->deleteLater();
+    game = new Game(18);
+    setupGame();
+    resizeEvent(nullptr);
 }
 
 void MainWindow::closeServer() {
@@ -116,8 +151,8 @@ void MainWindow::closeServer() {
     host->setDisabled(false);
     game->deleteLater();
     game = new Game(18);
-    connect(game, &Game::gameOver, this, &MainWindow::score);
-    connect(gameover, &GameOverBox::closed, game, &Game::reset);
+    setupGame();
+    resizeEvent(nullptr);
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {

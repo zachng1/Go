@@ -20,7 +20,7 @@ public slots:
     void socketEvent();
     void swapTurn(int COLOUR);
 signals:
-
+    void error();
 private:
     QTcpSocket * s;
     bool myturn;

@@ -17,6 +17,7 @@ void GameOnline::setSocket(QTcpSocket * socket) {
     s = socket;
     connect(s, &QIODevice::readyRead,
             this, &GameOnline::socketEvent);
+    connect(s, &QTcpSocket::errorOccurred, this, &GameOnline::error);
 }
 
 void GameOnline::setTurn(bool turn) {
@@ -31,12 +32,10 @@ void GameOnline::swapTurn(int COLOUR) {
 }
 
 
+//read mouseEvent from peer
 void GameOnline::socketEvent() {
     QDataStream socketdstream(s);
     socketdstream.setVersion(QDataStream::Qt_5_14);
-
-    //this whole thing needs a makeover jesus christ
-    //but it works??!
     socketdstream.startTransaction();
     quint32 bufsize;
     QEvent::Type type;
@@ -82,10 +81,8 @@ void GameOnline::mouseMoveEvent(QMouseEvent *event) {
     }
 }
 
-void GameOnline::sendMouseEvent(QMouseEvent *event) {
 
-    //this also needs a fucking makeoverlol
-    //but hey
+void GameOnline::sendMouseEvent(QMouseEvent *event) {
     QByteArray buffer;
     QDataStream bufferdstream(&buffer, QIODevice::ReadWrite);
     bufferdstream.setVersion(QDataStream::Qt_5_14);

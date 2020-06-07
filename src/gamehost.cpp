@@ -5,11 +5,13 @@ GameHost::GameHost(int s, QWidget * parent) : GameOnline(s, parent),
 {
     connect(server, &QTcpServer::newConnection,
             this, &GameHost::clientJoin);
+    //connect(this, &GameHost::connection,
+      //      this, &GameHost::sendSize);
     //host always starts as black
     setTurn(true);
 }
 
-void GameHost::host() {
+int GameHost::host() {
     if (server->listen()) {
         const QHostAddress &localhost = QHostAddress(QHostAddress::LocalHost);
         QHostAddress a = localhost;
@@ -19,8 +21,9 @@ void GameHost::host() {
             }
         }
         emit listening(a, server->serverPort());
+        return 0;
     }
-    else printf("Error listening");
+    return -1;
 }
 
 void GameHost::clientJoin() {
@@ -29,3 +32,10 @@ void GameHost::clientJoin() {
     server->close();
     emit connection();
 }
+
+/*void GameHost::sendSize() {
+   QByteArray arr;
+   arr.setNum(size());
+   socket()->write(arr);
+   qDebug() << arr;
+}*/

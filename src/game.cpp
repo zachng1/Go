@@ -218,3 +218,7 @@ int Game::score(int COLOUR) {
     }
     return sc;
 }
+
+int Game::size() {
+    return s;
+}
